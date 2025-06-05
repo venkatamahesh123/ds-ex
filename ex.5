@@ -1,0 +1,90 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+import scipy.stats as stats
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.metrics import accuracy_score, mean_squared_error, r2_score
+
+# 🔹 Load Diabetes Dataset from GitHub (raw URL)
+try:
+    file_url = "https://raw.githubusercontent.com/venkatamahesh123/datasets/main/diabetes.csv"
+    diabetes_df = pd.read_csv(file_url)
+    print("\n✅ Diabetes dataset loaded successfully.")
+except:
+    print("\n⚠️ Unable to load Diabetes dataset. Please check the URL or your internet connection.")
+
+# Selecting only numerical columns
+numerical_cols = diabetes_df.select_dtypes(include=[np.number]).columns
+
+# 🔹 Descriptive Statistics
+print("\n--- Descriptive Statistics ---\n")
+for col in numerical_cols:
+    print(f"🔹 Column: {col}")
+    print(f"Frequency (Top 5):\n{diabetes_df[col].value_counts().head()}")
+    print(f"Mean: {diabetes_df[col].mean():.2f}")
+    print(f"Median: {diabetes_df[col].median():.2f}")
+    print(f"Mode: {diabetes_df[col].mode().values}")
+    print(f"Variance: {diabetes_df[col].var():.2f}")
+    print(f"Standard Deviation: {diabetes_df[col].std():.2f}")
+    print("-" * 50)
+
+# 🔹 Univariate Analysis (Skewness & Kurtosis)
+print("\n--- Univariate Analysis: Skewness & Kurtosis ---\n")
+for col in numerical_cols:
+    skewness = diabetes_df[col].skew()
+    kurtosis = diabetes_df[col].kurt()
+    print(f"📊 '{col}' - Skewness: {skewness:.2f}, Kurtosis: {kurtosis:.2f}")
+
+# 🔹 Bivariate Analysis (Linear Regression)
+print("\n--- Bivariate Analysis: Linear Regression ---\n")
+X = diabetes_df[['Glucose', 'BMI']]  # Predictors
+y = diabetes_df['Outcome']  # Target variable
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+linear_model = LinearRegression()
+linear_model.fit(X_train, y_train)
+y_pred_linear = linear_model.predict(X_test)
+
+print(f"Linear Regression R² Score: {r2_score(y_test, y_pred_linear):.4f}")
+print(f"Linear Regression MSE: {mean_squared_error(y_test, y_pred_linear):.4f}")
+
+# 🔹 Bivariate Analysis (Logistic Regression)
+print("\n--- Bivariate Analysis: Logistic Regression ---\n")
+logistic_model = LogisticRegression(max_iter=1000)
+logistic_model.fit(X_train, y_train)
+y_pred_logistic = logistic_model.predict(X_test)
+
+accuracy = accuracy_score(y_test, y_pred_logistic)
+print(f"Logistic Regression Accuracy: {accuracy:.4f}")
+
+# 🔹 Multiple Regression Analysis
+print("\n--- Multiple Regression Analysis ---\n")
+X_mult = diabetes_df.drop(columns=['Outcome'])
+y_mult = diabetes_df['Outcome']
+
+X_train, X_test, y_train, y_test = train_test_split(X_mult, y_mult, test_size=0.2, random_state=42)
+mult_reg_model = LinearRegression()
+mult_reg_model.fit(X_train, y_train)
+y_pred_mult = mult_reg_model.predict(X_test)
+
+print(f"Multiple Regression R² Score: {r2_score(y_test, y_pred_mult):.4f}")
+print(f"Multiple Regression MSE: {mean_squared_error(y_test, y_pred_mult):.4f}")
+
+# 🔹 Compare Results
+print("\n--- Comparison of Results ---")
+print(f"Linear Regression R² Score: {r2_score(y_test, y_pred_linear):.4f}")
+print(f"Logistic Regression Accuracy: {accuracy:.4f}")
+print(f"Multiple Regression R² Score: {r2_score(y_test, y_pred_mult):.4f}")
+
+# 🔹 Visualization: Normal Curve Plot
+plt.figure(figsize=(10, 5))
+sns.histplot(diabetes_df['Glucose'], kde=True, color='blue', bins=30)
+plt.title("Normal Curve for Glucose Levels")
+plt.xlabel("Glucose")
+plt.ylabel("Frequency")
+plt.tight_layout()
+plt.show()
+
+
