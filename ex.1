@@ -1,0 +1,59 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+# -------------------------------------------
+# Step 1: Define the URL to scrape
+# -------------------------------------------
+url = "https://quotes.toscrape.com/"
+
+try:
+    # -------------------------------------------
+    # Step 2: Send a GET request to the website
+    # -------------------------------------------
+    response = requests.get(url, timeout=10)  # Request webpage with a timeout
+    response.raise_for_status()  # Raise an error for HTTP failures (4xx, 5xx)
+
+    # -------------------------------------------
+    # Step 3: Parse the webpage content using BeautifulSoup
+    # -------------------------------------------
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    # -------------------------------------------
+    # Step 4: Extract quotes and authors
+    # -------------------------------------------
+    data_list = []  # List to store scraped data
+    quotes = soup.find_all('div', class_='quote')  # Find all quote blocks
+
+    for quote in quotes:
+        # Extract quote text safely
+        text_element = quote.find('span', class_='text')
+        text = text_element.get_text(strip=True) if text_element else "N/A"
+
+        # Extract author name safely
+        author_element = quote.find('small', class_='author')
+        author = author_element.get_text(strip=True) if author_element else "N/A"
+
+        # Add to list
+        data_list.append([text, author])
+
+    # -------------------------------------------
+    # Step 5: Create a DataFrame
+    # -------------------------------------------
+    df = pd.DataFrame(data_list, columns=["Quote", "Author"])
+
+    # -------------------------------------------
+    # Step 6: Save DataFrame to CSV file
+    # -------------------------------------------
+    df.to_csv("scraped_quotes.csv", index=False, encoding='utf-8')
+
+    print("✅ Web Scraping Successful! Data saved to scraped_quotes.csv")
+
+    # -------------------------------------------
+    # Step 7: Print the first 5 rows as output
+    # -------------------------------------------
+    print(df.head())
+
+except requests.exceptions.RequestException as e:
+    print(f"❌ Failed to retrieve the webpage. Error: {e}")
+
