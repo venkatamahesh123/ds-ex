@@ -1,0 +1,67 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import LabelEncoder
+
+# Load the datasets
+# Corrected variable name from ci_data to uci_data
+uci_data = pd.read_csv("https://raw.githubusercontent.com/venkatamahesh123/datasets/main/heart_disease_uci.csv")
+pima_data = pd.read_csv("https://raw.githubusercontent.com/venkatamahesh123/datasets/main/diabetes.csv")  # Pima Indians Diabetes Dataset
+
+# Display first few rows of both datasets
+print("UCI Dataset:")
+print(uci_data.head())
+print("\nPima Indians Diabetes Dataset:")
+print(pima_data.head())
+
+# Check for missing values
+print("\nMissing Values in UCI Dataset:")
+print(uci_data.isnull().sum())
+print("\nMissing Values in Pima Dataset:")
+print(pima_data.isnull().sum())
+
+# Summary Statistics
+print("\nSummary Statistics for UCI Dataset:")
+print(uci_data.describe())
+print("\nSummary Statistics for Pima Dataset:")
+print(pima_data.describe())
+
+# Handle categorical columns in UCI dataset
+encoder = LabelEncoder()
+categorical_columns = uci_data.select_dtypes(include=['object']).columns  # Identify categorical columns
+for col in categorical_columns:
+    uci_data[col] = encoder.fit_transform(uci_data[col])  # Encode categorical values
+
+# Visualization: Histograms of features
+uci_data.hist(figsize=(12, 8), bins=20)
+plt.suptitle("Histograms - UCI Dataset")
+plt.show()
+
+pima_data.hist(figsize=(12, 8), bins=20)
+plt.suptitle("Histograms - Pima Indians Diabetes Dataset")
+plt.show()
+
+# Correlation Heatmap (excluding non-numeric columns)
+plt.figure(figsize=(10, 6))
+sns.heatmap(uci_data.corr(), annot=True, cmap="coolwarm", linewidths=0.5)
+plt.title("Correlation Heatmap - UCI Dataset")
+plt.show()
+
+plt.figure(figsize=(10, 6))
+sns.heatmap(pima_data.corr(), annot=True, cmap="coolwarm", linewidths=0.5)
+plt.title("Correlation Heatmap - Pima Indians Diabetes Dataset")
+plt.show()
+
+# Boxplot to check outliers
+plt.figure(figsize=(12, 6))
+sns.boxplot(data=pima_data)
+plt.title("Boxplot of Pima Indians Diabetes Dataset")
+plt.xticks(rotation=45)
+plt.show()
+
+plt.figure(figsize=(12, 6))
+sns.boxplot(data=uci_data)
+plt.title("Boxplot of UCI Dataset")
+plt.xticks(rotation=45)
+plt.show()
