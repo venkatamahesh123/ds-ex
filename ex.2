@@ -1,0 +1,66 @@
+# Step 1: Import Required Libraries
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+
+# Step 2: Load the Iris Dataset
+iris = load_iris()
+df = pd.DataFrame(data=iris.data, columns=iris.feature_names)
+
+# Add target column with species names
+df['species'] = iris.target
+df['species'] = df['species'].map({0: 'setosa', 1: 'versicolor', 2: 'virginica'})
+
+# Display first few rows
+print("First 5 rows of the dataset:")
+print(df.head())
+
+# Step 3: Data Preprocessing & Cleaning
+# Check for missing values
+print("\nMissing Values in Each Column:")
+print(df.isnull().sum())
+
+# Check for duplicate rows
+print("\nNumber of Duplicate Rows:", df.duplicated().sum())
+
+# Rename Columns for Better Readability
+df.columns = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'species']
+
+# Step 4: Data Wrangling
+# Adding new features (Sepal Area & Petal Area)
+df['sepal_area'] = df['sepal_length'] * df['sepal_width']
+df['petal_area'] = df['petal_length'] * df['petal_width']
+
+# Step 5: Exploratory Data Analysis (EDA)
+# Summary Statistics
+print("\nStatistical Summary of Numerical Features:")
+print(df.describe())
+
+# Visualizations
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=df.iloc[:, :-1])  # Exclude species column for boxplot
+plt.title("Boxplot of Features")
+plt.show()
+
+# Pairplot to Visualize Feature Relationships
+sns.pairplot(df, hue='species', markers=["o", "s", "D"])
+plt.show()
+
+# Correlation Heatmap
+plt.figure(figsize=(8, 6))
+df_numeric = df.select_dtypes(include=['number'])
+sns.heatmap(df_numeric.corr(), annot=True, cmap='coolwarm', fmt=".2f")
+plt.title("Feature Correlation Matrix")
+plt.show()
+
+# Count Plot of Species Distribution
+sns.countplot(x='species', data=df, palette="Set2")
+plt.title("Species Distribution")
+plt.show()
+
+# Step 6: Save the Cleaned Data
+df.to_csv('cleaned_iris.csv', index=False)
+print("\nCleaned dataset saved as 'cleaned_iris.csv'")
+
