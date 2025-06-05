@@ -1,0 +1,56 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+import scipy.stats as stats
+from mpl_toolkits.mplot3d import Axes3D
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.metrics import accuracy_score, mean_squared_error, r2_score
+
+# 🔹 Load Diabetes Dataset
+try:
+    diabetes_df = pd.read_csv("diabetes.csv")
+    print("\n✅ Diabetes dataset loaded successfully.")
+except:
+    print("\n⚠️ Unable to load Diabetes dataset. Please check the file path.")
+
+# 🔹 Density & Contour Plots
+plt.figure(figsize=(8, 6))
+sns.kdeplot(x=diabetes_df['Glucose'], y=diabetes_df['BMI'], cmap='coolwarm', fill=True)
+plt.title("Density & Contour Plot: Glucose vs BMI")
+plt.xlabel("Glucose Level")
+plt.ylabel("BMI")
+plt.show()
+
+# 🔹 Correlation Heatmap
+plt.figure(figsize=(10, 6))
+sns.heatmap(diabetes_df.corr(), annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
+plt.title("Correlation Matrix Heatmap")
+plt.show()
+
+# 🔹 Scatter Plot (Glucose vs BMI)
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x=diabetes_df['Glucose'], y=diabetes_df['BMI'], hue=diabetes_df['Outcome'], palette='coolwarm')
+plt.title("Scatter Plot: Glucose vs BMI")
+plt.xlabel("Glucose")
+plt.ylabel("BMI")
+plt.show()
+
+# 🔹 Histograms for all numerical columns
+diabetes_df.hist(figsize=(12, 8), bins=30, edgecolor='black')
+plt.suptitle("Histograms of Diabetes Dataset Features")
+plt.show()
+
+# 🔹 3D Plot (Glucose, BMI, Age)
+fig = plt.figure(figsize=(10, 6))
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter(diabetes_df['Glucose'], diabetes_df['BMI'], diabetes_df['Age'], c=diabetes_df['Outcome'], cmap='coolwarm')
+
+ax.set_xlabel("Glucose")
+ax.set_ylabel("BMI")
+ax.set_zlabel("Age")
+ax.set_title("3D Scatter Plot: Glucose vs BMI vs Age")
+plt.show()
+
+
